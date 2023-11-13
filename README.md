@@ -6,5 +6,8 @@ This is a personal project of implementing a basic Neural Network framework in C
 ## How to use
 As of currently, this is unusuable, due to... not being finished...
 
+## Documentation
+Currently Documentation is minor, however I plan to add doxygen comments once I'm happy with the code
+
 ## License
 Licensed under the MIT License.
