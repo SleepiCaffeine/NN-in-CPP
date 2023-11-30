@@ -2,6 +2,7 @@
 #define MATRIX_HPP_
 
 #include <vector>     // std::vector()
+#include <string>
 
 // To avoid writing a bunch
 #define ULL unsigned long long
@@ -19,6 +20,7 @@ public:
   Matrix(ULL r, ULL c);
   Matrix(ULL r, ULL c, long double val);
   Matrix(ULL r, ULL c, long double* arr, ULL arrSize);
+  Matrix(const Matrix& copy);
 
   // Functions that affect the whole matrix
 
@@ -28,25 +30,32 @@ public:
   void randomize(long double min, long double max) noexcept;
   void invoke_func( long double (*function)(long double) ) noexcept;
   void transpose() noexcept;
-  
+  void flatten() noexcept;
+
   // Functions to retrieve a value / values from the Matrix Object
 
   std::vector<long double> get_matrix() const noexcept;
-  constexpr ULL get_rows() const noexcept;
-  constexpr ULL get_cols() const noexcept;
-  long double at(ULL r, ULL c) const;
+  ULL get_rows() const noexcept;
+  ULL get_cols() const noexcept;
+  long double at(ULL r, ULL c) const ;
   void set_at(ULL r, ULL c, long double val);
+  int largest_val_idx() const;
 
-  // Operator overrides for the Matrix Class
+  // Operator overrides for the Matrix Class 
 
-  Matrix operator+(Matrix const& mat);
-  Matrix operator+=(Matrix const& mat);
-  Matrix operator-(Matrix const& mat);
-  Matrix operator-=(Matrix const& mat);
-  Matrix operator*(Matrix const& mat);
+  Matrix operator+(Matrix const& mat)  const;
+  Matrix operator+=(Matrix const& mat) const;
+  Matrix operator-(Matrix const& mat)  const;
+  Matrix operator-=(Matrix const& mat) const;
+  Matrix operator*(Matrix const& mat)  const;
+  Matrix operator*=(Matrix const& mat) const;
 
-  // Helper function
+  // Helper functions
   void display() const noexcept;
+  void save(const char* file_name) const;
+  void load(const char* file_name);
+  void save(std::string file_name) const;
+  void load(std::string file_name);
 };
 
 void check_matrix_dimensions(const Matrix m1, const Matrix m2);
