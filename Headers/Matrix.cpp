@@ -24,7 +24,7 @@ Matrix::Matrix(ULL r, ULL c, long double val) : rows{r}, cols{c} {
 Matrix::Matrix(ULL r, ULL c, long double* arr, ULL arrSize) : rows{r}, cols{c} {
   if (rows * cols != arrSize)
     throw std::length_error(INVALID_ARR_SIZE_ERR);
-  this->set_as(arr, arrSize);
+  m = std::vector<long double>(arr, arr+arrSize);
 }
 
 Matrix::Matrix(ULL r, ULL c, std::vector <long double> data) : rows{r}, cols{c} {
@@ -50,7 +50,7 @@ void Matrix::set_as(long double *arr, ULL arrSize) {
 }
 
 // Function that converts provided vector to Matrix
-void Matrix::set_as(std::vector<long double> arr) {
+void Matrix::set_as(std::vector<long double>& arr) {
   // Asserting that size is valid for emplacement
   if (arr.size() != rows * cols) {
     throw std::length_error(INVALID_ARR_SIZE_ERR);
@@ -76,6 +76,7 @@ void Matrix::set_at(ULL r, ULL c, long double val) {
     throw std::range_error(COLUMN_INDEX_ERR);
   if (r > rows - 1)
     throw std::range_error(ROW_INDEX_ERR);
+  //std::cout << "Setting: " << val << " | At R:" << r << " C:" << c << '\n';
   m.at(r * cols + c) = val;
 }
 
@@ -141,7 +142,7 @@ int Matrix::largest_val_idx() const {
 Matrix Matrix::operator+(Matrix const& mat) const {
   check_matrix_dimensions(*this, mat);
   Matrix res(this->rows, this->cols);
-  for (ULL r = 0; r <this->rows; ++r) {
+  for (ULL r = 0; r < this->rows; ++r) {
     for (ULL c = 0; c < this->cols; ++c) {
       long double sum = this->at(r, c) + mat.at(r, c);
       res.set_at(r, c, sum);
@@ -155,24 +156,33 @@ Matrix Matrix::operator+=(Matrix const& mat) const {
   return *this + mat; 
 }
 
+template <typename T>
+void display_vector(const std::vector <T> vec) {
+  for (const T& item : vec) {
+    std::cout << std::fixed << std::setprecision(5) << item << " ";
+  }
+  std::cout <<  "\n";
+}
+
 /* Operator overload to have Matrix Multiplication
   [NOTE: THIS FUNCTIONS AS THE 'DOT' OPERATION! FOR MULTIPLYING MATRIX VALUES GO SEE ../Headers/MatrixOperations.hpp]
 */
-Matrix Matrix::operator*(Matrix const& mat) const {
+Matrix Matrix::operator*(Matrix const& mat) {
   // Assert that the inner sizes are identical
   if (this->cols != mat.rows)
     throw std::domain_error(INVALID_MATRIX_DIM_ERR);
+
   Matrix res(this->rows, mat.cols);
 
   for (ULL r = 0; r < res.get_rows(); ++r) {
     for (ULL c = 0; c < res.get_cols(); ++c) {
+      long double product_sum = 0;
       for (ULL n = 0; n < this->cols; ++n) {
-        long double product = this->at(r, n) * mat.at(n, c);
-        res.set_at(r, c, product);
+        product_sum += this->at(r, n) * mat.at(n, c);
       }
+      res.set_at(r, c, product_sum);
     }
   }
-
   return res;
 }
 
@@ -195,20 +205,24 @@ Matrix Matrix::operator-=(Matrix const& mat) const {
   return *this - mat; 
 }
 
-Matrix Matrix::operator*=(Matrix const& mat) const {
-  return *this * mat;
+void Matrix::operator*=(Matrix const& mat) {
+  *this = *this * mat;
 }
 
 // Helper function to display the contents of the Matrix
 void Matrix::display() const noexcept {
   unsigned int col = 0;       // Saving current column number
   std::cout << "Rows: " << rows << " | Cols: " << cols << '\n';
-  for (long double d : m) {   // For every matrix element
+  for (const long double& d : m) {   // For every matrix element
     std::cout << std::fixed << std::setprecision(4) << d << " ";      // Print it
     ++col;                      // Index current column
     if (col % cols == 0)        // If it is a multiple of 'cols'
       std::cout << "\n";          // Add a newline
   }
+}
+
+void Matrix::display_config() const noexcept {
+  std::cout << "Rows: " << rows << "\nCols: " << cols << "\n";
 }
 
 void Matrix::save(const char* file_name) const {
@@ -260,6 +274,8 @@ void Matrix::load(std::string file_name) {
 
 // Function to check if the 2 provided matrixes have identical dimensions
 void check_matrix_dimensions(const Matrix m1, const Matrix m2) {
+  // std::cout << "Attempting to operate on Matrixes:\n\tRows: " << m1.get_rows() << "\n\tCols: " << m1.get_cols() 
+  //           << "\n\tRows: " << m2.get_rows() << "\n\tCols: " << m2.get_cols() << "\n";
   if (m1.get_cols() != m2.get_cols())
     throw std::invalid_argument(INVALID_COLUMN_SIZE_ERR);
   if (m1.get_rows() != m2.get_rows())

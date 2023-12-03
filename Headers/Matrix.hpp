@@ -27,7 +27,7 @@ public:
 
   void fill(long double val) noexcept;
   void set_as(long double* arr, ULL arrSize);
-  void set_as(std::vector<long double> arr);
+  void set_as(std::vector<long double>& arr);
   void randomize(long double min, long double max) noexcept;
   void invoke_func( long double (*function)(long double) ) noexcept;
   void transpose() noexcept;
@@ -48,11 +48,12 @@ public:
   Matrix operator+=(Matrix const& mat) const;
   Matrix operator-(Matrix const& mat)  const;
   Matrix operator-=(Matrix const& mat) const;
-  Matrix operator*(Matrix const& mat)  const;
-  Matrix operator*=(Matrix const& mat) const;
+  Matrix operator*(Matrix const& mat);
+  void operator*=(Matrix const& mat);
 
   // Helper functions
   void display() const noexcept;
+  void display_config() const noexcept;
   void save(const char* file_name) const;
   void load(const char* file_name);
   void save(std::string file_name) const;
