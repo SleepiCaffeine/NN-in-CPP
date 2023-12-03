@@ -20,6 +20,7 @@ public:
   Matrix(ULL r, ULL c);
   Matrix(ULL r, ULL c, long double val);
   Matrix(ULL r, ULL c, long double* arr, ULL arrSize);
+  Matrix(ULL r, ULL c, std::vector <long double> data);
   Matrix(const Matrix& copy);
 
   // Functions that affect the whole matrix

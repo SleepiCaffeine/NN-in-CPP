@@ -14,7 +14,7 @@
 #define INVALID_MATRIX_DIM_ERR "DOT ERROR: Invalid matrix dimension sizes!\n"
 #define NON_FLATTENED_MATRIX_PROVIDED_ERR "LARGEST_VAL_IDX ERROR: The provided Matrix is not flattened!\n"
 
-Matrix::Matrix() : Matrix(0, 0) { };
+Matrix::Matrix() : Matrix(0, 0, 0) { };
 Matrix::Matrix(ULL r, ULL c) : Matrix(r, c, 0) { }
 Matrix::Matrix(ULL r, ULL c, long double val) : rows{r}, cols{c} {
   m.resize(r * c);
@@ -22,11 +22,18 @@ Matrix::Matrix(ULL r, ULL c, long double val) : rows{r}, cols{c} {
 }
 
 Matrix::Matrix(ULL r, ULL c, long double* arr, ULL arrSize) : rows{r}, cols{c} {
-  *this = Matrix(r, c);
+  if (rows * cols != arrSize)
+    throw std::length_error(INVALID_ARR_SIZE_ERR);
   this->set_as(arr, arrSize);
 }
 
-Matrix::Matrix(const Matrix& copy) : rows{copy.get_rows()}, cols{copy.get_cols()}, m{copy.get_matrix()} { }
+Matrix::Matrix(ULL r, ULL c, std::vector <long double> data) : rows{r}, cols{c} {
+  if (rows * cols != data.size())
+    throw std::length_error(INVALID_ARR_SIZE_ERR);
+  m = data;
+}
+
+Matrix::Matrix(const Matrix& copy) : rows{copy.get_rows()}, cols{copy.get_cols()}, m{copy.get_matrix()} {}
 
 void Matrix::fill(long double val) noexcept {
   std::fill(m.begin(), m.end(), val);
@@ -45,8 +52,9 @@ void Matrix::set_as(long double *arr, ULL arrSize) {
 // Function that converts provided vector to Matrix
 void Matrix::set_as(std::vector<long double> arr) {
   // Asserting that size is valid for emplacement
-  if (arr.size() != m.size())
+  if (arr.size() != rows * cols) {
     throw std::length_error(INVALID_ARR_SIZE_ERR);
+  }
 
   // Copying over vector
   m = arr;
